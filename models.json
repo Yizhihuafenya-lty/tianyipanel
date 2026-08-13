@@ -1,0 +1,302 @@
+[
+  {
+    "id": "qwen2.5-0.5b",
+    "name": "Qwen2.5 0.5B",
+    "model": "qwen2.5:0.5b",
+    "category": "对话",
+    "size": "约 0.4 GB",
+    "memory": "1GB 起步",
+    "desc": "通义千问 2.5 最小版，适合低配机器快速验证",
+    "command": "ollama pull qwen2.5:0.5b"
+  },
+  {
+    "id": "qwen2.5-1.5b",
+    "name": "Qwen2.5 1.5B",
+    "model": "qwen2.5:1.5b",
+    "category": "对话",
+    "size": "约 1.1 GB",
+    "memory": "2GB 起步",
+    "desc": "轻量通用对话，速度和效果比较均衡",
+    "command": "ollama pull qwen2.5:1.5b"
+  },
+  {
+    "id": "qwen2.5-3b",
+    "name": "Qwen2.5 3B",
+    "model": "qwen2.5:3b",
+    "category": "对话",
+    "size": "约 1.9 GB",
+    "memory": "4GB 起步",
+    "desc": "小显存机器上的通用对话主力",
+    "command": "ollama pull qwen2.5:3b"
+  },
+  {
+    "id": "qwen2.5-7b",
+    "name": "Qwen2.5 7B",
+    "model": "qwen2.5:7b",
+    "category": "对话",
+    "size": "约 4.7 GB",
+    "memory": "8GB 起步",
+    "desc": "通用对话经典档位，中文表现优秀",
+    "command": "ollama pull qwen2.5:7b"
+  },
+  {
+    "id": "qwen2.5-14b",
+    "name": "Qwen2.5 14B",
+    "model": "qwen2.5:14b",
+    "category": "对话",
+    "size": "约 9 GB",
+    "memory": "16GB 起步",
+    "desc": "更高智能的通用对话模型",
+    "command": "ollama pull qwen2.5:14b"
+  },
+  {
+    "id": "qwen2.5-32b",
+    "name": "Qwen2.5 32B",
+    "model": "qwen2.5:32b",
+    "category": "对话",
+    "size": "约 19 GB",
+    "memory": "32GB 起步",
+    "desc": "接近旗舰效果的通用对话模型",
+    "command": "ollama pull qwen2.5:32b"
+  },
+  {
+    "id": "qwen2.5-coder-0.5b",
+    "name": "Qwen2.5 Coder 0.5B",
+    "model": "qwen2.5-coder:0.5b",
+    "category": "编程",
+    "size": "约 0.4 GB",
+    "memory": "1GB 起步",
+    "desc": "代码生成最小版，低配也能跑",
+    "command": "ollama pull qwen2.5-coder:0.5b"
+  },
+  {
+    "id": "qwen2.5-coder-1.5b",
+    "name": "Qwen2.5 Coder 1.5B",
+    "model": "qwen2.5-coder:1.5b",
+    "category": "编程",
+    "size": "约 1.1 GB",
+    "memory": "2GB 起步",
+    "desc": "轻量代码补全与生成",
+    "command": "ollama pull qwen2.5-coder:1.5b"
+  },
+  {
+    "id": "qwen2.5-coder-3b",
+    "name": "Qwen2.5 Coder 3B",
+    "model": "qwen2.5-coder:3b",
+    "category": "编程",
+    "size": "约 1.9 GB",
+    "memory": "4GB 起步",
+    "desc": "小显存机器上的编程助手",
+    "command": "ollama pull qwen2.5-coder:3b"
+  },
+  {
+    "id": "qwen2.5-coder-7b",
+    "name": "Qwen2.5 Coder 7B",
+    "model": "qwen2.5-coder:7b",
+    "category": "编程",
+    "size": "约 5.2 GB",
+    "memory": "8GB 起步",
+    "desc": "代码补全、解释和重构的常用档位",
+    "command": "ollama pull qwen2.5-coder:7b"
+  },
+  {
+    "id": "qwen2.5-coder-14b",
+    "name": "Qwen2.5 Coder 14B",
+    "model": "qwen2.5-coder:14b",
+    "category": "编程",
+    "size": "约 9 GB",
+    "memory": "16GB 起步",
+    "desc": "更强代码理解能力",
+    "command": "ollama pull qwen2.5-coder:14b"
+  },
+  {
+    "id": "qwen2.5-coder-32b",
+    "name": "Qwen2.5 Coder 32B",
+    "model": "qwen2.5-coder:32b",
+    "category": "编程",
+    "size": "约 19 GB",
+    "memory": "32GB 起步",
+    "desc": "本地代码模型第一梯队",
+    "command": "ollama pull qwen2.5-coder:32b"
+  },
+  {
+    "id": "deepseek-r1-1.5b",
+    "name": "DeepSeek R1 1.5B",
+    "model": "deepseek-r1:1.5b",
+    "category": "推理",
+    "size": "约 1.1 GB",
+    "memory": "2GB 起步",
+    "desc": "带思维链的最小推理模型",
+    "command": "ollama pull deepseek-r1:1.5b"
+  },
+  {
+    "id": "deepseek-r1-7b",
+    "name": "DeepSeek R1 7B",
+    "model": "deepseek-r1:7b",
+    "category": "推理",
+    "size": "约 4.7 GB",
+    "memory": "8GB 起步",
+    "desc": "推理任务常用档位",
+    "command": "ollama pull deepseek-r1:7b"
+  },
+  {
+    "id": "deepseek-r1-8b",
+    "name": "DeepSeek R1 8B",
+    "model": "deepseek-r1:8b",
+    "category": "推理",
+    "size": "约 4.9 GB",
+    "memory": "8GB 起步",
+    "desc": "蒸馏版推理模型，中文友好",
+    "command": "ollama pull deepseek-r1:8b"
+  },
+  {
+    "id": "deepseek-r1-14b",
+    "name": "DeepSeek R1 14B",
+    "model": "deepseek-r1:14b",
+    "category": "推理",
+    "size": "约 9 GB",
+    "memory": "16GB 起步",
+    "desc": "更高推理质量",
+    "command": "ollama pull deepseek-r1:14b"
+  },
+  {
+    "id": "deepseek-r1-32b",
+    "name": "DeepSeek R1 32B",
+    "model": "deepseek-r1:32b",
+    "category": "推理",
+    "size": "约 19 GB",
+    "memory": "32GB 起步",
+    "desc": "本地推理旗舰档位",
+    "command": "ollama pull deepseek-r1:32b"
+  },
+  {
+    "id": "llama3.2-1b",
+    "name": "Llama 3.2 1B",
+    "model": "llama3.2:1b",
+    "category": "对话",
+    "size": "约 1.3 GB",
+    "memory": "2GB 起步",
+    "desc": "Meta 轻量模型，速度快",
+    "command": "ollama pull llama3.2:1b"
+  },
+  {
+    "id": "llama3.2-3b",
+    "name": "Llama 3.2 3B",
+    "model": "llama3.2:3b",
+    "category": "对话",
+    "size": "约 2 GB",
+    "memory": "4GB 起步",
+    "desc": "小显存通用对话",
+    "command": "ollama pull llama3.2:3b"
+  },
+  {
+    "id": "gemma3-4b",
+    "name": "Gemma 3 4B",
+    "model": "gemma3:4b",
+    "category": "对话",
+    "size": "约 3.3 GB",
+    "memory": "6GB 起步",
+    "desc": "Google 轻量多模态模型",
+    "command": "ollama pull gemma3:4b"
+  },
+  {
+    "id": "gemma2-2b",
+    "name": "Gemma 2 2B",
+    "model": "gemma2:2b",
+    "category": "对话",
+    "size": "约 1.7 GB",
+    "memory": "4GB 起步",
+    "desc": "轻量对话，适合低配",
+    "command": "ollama pull gemma2:2b"
+  },
+  {
+    "id": "gemma2-9b",
+    "name": "Gemma 2 9B",
+    "model": "gemma2:9b",
+    "category": "对话",
+    "size": "约 5.5 GB",
+    "memory": "8GB 起步",
+    "desc": "Google 通用对话模型",
+    "command": "ollama pull gemma2:9b"
+  },
+  {
+    "id": "mistral-7b",
+    "name": "Mistral 7B",
+    "model": "mistral:7b",
+    "category": "对话",
+    "size": "约 4.4 GB",
+    "memory": "8GB 起步",
+    "desc": "老牌开源通用模型",
+    "command": "ollama pull mistral:7b"
+  },
+  {
+    "id": "mixtral-8x7b",
+    "name": "Mixtral 8x7B",
+    "model": "mixtral:8x7b",
+    "category": "对话",
+    "size": "约 26 GB",
+    "memory": "32GB 起步",
+    "desc": "MoE 架构，效果接近更大模型",
+    "command": "ollama pull mixtral:8x7b"
+  },
+  {
+    "id": "phi4-14b",
+    "name": "Phi-4 14B",
+    "model": "phi4:14b",
+    "category": "推理",
+    "size": "约 9.1 GB",
+    "memory": "16GB 起步",
+    "desc": "微软 Phi 系列，数学与推理突出",
+    "command": "ollama pull phi4:14b"
+  },
+  {
+    "id": "llava-7b",
+    "name": "LLaVA 7B",
+    "model": "llava:7b",
+    "category": "视觉",
+    "size": "约 4.7 GB",
+    "memory": "8GB 起步",
+    "desc": "图片理解与描述",
+    "command": "ollama pull llava:7b"
+  },
+  {
+    "id": "bakllava-7b",
+    "name": "BakLLaVA 7B",
+    "model": "bakllava:7b",
+    "category": "视觉",
+    "size": "约 5.2 GB",
+    "memory": "8GB 起步",
+    "desc": "图片理解模型，支持视觉问答",
+    "command": "ollama pull bakllava:7b"
+  },
+  {
+    "id": "nomic-embed-text",
+    "name": "Nomic Embed Text",
+    "model": "nomic-embed-text",
+    "category": "嵌入",
+    "size": "约 0.27 GB",
+    "memory": "1GB 起步",
+    "desc": "文本向量化，适合知识库",
+    "command": "ollama pull nomic-embed-text"
+  },
+  {
+    "id": "bge-m3",
+    "name": "BGE-M3",
+    "model": "bge-m3",
+    "category": "嵌入",
+    "size": "约 1.2 GB",
+    "memory": "2GB 起步",
+    "desc": "多语言文本向量化",
+    "command": "ollama pull bge-m3"
+  },
+  {
+    "id": "mxbai-embed-large",
+    "name": "mxbai-embed-large",
+    "model": "mxbai-embed-large",
+    "category": "嵌入",
+    "size": "约 0.7 GB",
+    "memory": "1GB 起步",
+    "desc": "高质量英文文本向量化",
+    "command": "ollama pull mxbai-embed-large"
+  }
+]
