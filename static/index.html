@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>天依 Linux 面板</title>
+  <link rel="stylesheet" href="/style.css?v=12">
+  <link rel="stylesheet" href="/vendor/xterm/xterm.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">T</span>
+        <div class="brand-text">
+          <strong>天依面板</strong>
+          <small>LINUX SERVER</small>
+        </div>
+        <button class="icon-btn sidebar-toggle" id="btnSidebarToggle" title="收起/展开菜单">
+          <i data-icon="chevrons-left"></i>
+        </button>
+      </div>
+      <nav class="nav" id="nav">
+        <button class="nav-item active" data-page="overview"><i data-icon="gauge"></i><span>概览</span></button>
+        <button class="nav-item" data-page="processes"><i data-icon="activity"></i><span>进程</span></button>
+        <button class="nav-item" data-page="guard"><i data-icon="shield"></i><span>守护</span></button>
+        <button class="nav-item" data-page="services"><i data-icon="server"></i><span>服务</span></button>
+        <button class="nav-item" data-page="database"><i data-icon="database"></i><span>数据库</span></button>
+        <button class="nav-item" data-page="sites"><i data-icon="globe"></i><span>网站</span></button>
+        <button class="nav-item" data-page="firewall"><i data-icon="flame"></i><span>防火墙</span></button>
+        <button class="nav-item" data-page="models"><i data-icon="cpu"></i><span>模型</span></button>
+        <button class="nav-item" data-page="apps"><i data-icon="package"></i><span>应用</span></button>
+        <button class="nav-item" data-page="files"><i data-icon="folder"></i><span>文件</span></button>
+        <button class="nav-item" data-page="terminal"><i data-icon="terminal"></i><span>终端</span></button>
+        <button class="nav-item" data-page="toolbox"><i data-icon="wrench"></i><span>工具箱</span></button>
+        <button class="nav-item" data-page="command"><i data-icon="command"></i><span>命令</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="sidebar-size">
+          <span class="muted">菜单宽度</span>
+          <input type="range" id="sidebarWidth" min="180" max="320" step="10" value="224" aria-label="菜单宽度">
+        </div>
+        <span class="status-dot" id="connDot"></span>
+        <span id="connText">连接中...</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-title">
+          <h1 id="pageTitle">概览</h1>
+          <p id="pageSubtitle">服务器状态一览</p>
+        </div>
+        <div class="topbar-actions">
+          <label class="auto-refresh" for="themeSelect">
+            <span class="muted">主题</span>
+            <select id="themeSelect" class="select sm" aria-label="界面主题">
+              <option value="deep">深空</option>
+              <option value="light">海盐</option>
+              <option value="ocean">深海</option>
+              <option value="amber">琥珀</option>
+            </select>
+          </label>
+          <div class="auto-refresh">
+            <span class="muted">自动刷新</span>
+            <select id="refreshInterval" class="select sm" aria-label="自动刷新间隔">
+              <option value="0">关闭</option>
+              <option value="1" selected>1 秒</option>
+              <option value="5">5 秒</option>
+              <option value="10">10 秒</option>
+              <option value="30">30 秒</option>
+              <option value="60">60 秒</option>
+            </select>
+          </div>
+          <button class="btn" id="btnRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+          <button class="btn ghost" id="btnSettings"><i data-icon="token"></i><span>设置</span></button>
+          <button class="btn ghost" id="btnToken"><i data-icon="key"></i><span>登录</span></button>
+        </div>
+      </header>
+
+      <section id="page-overview" class="page active">
+        <div class="metric-grid" id="metricGrid"></div>
+        <div class="panel trend-panel">
+          <div class="panel-head">
+            <h2>资源趋势</h2>
+            <div class="trend-tools">
+              <div class="segmented" id="trendRange">
+                <button class="seg" data-hours="1">1 小时</button>
+                <button class="seg" data-hours="6">6 小时</button>
+                <button class="seg active" data-hours="24">24 小时</button>
+                <button class="seg" data-hours="168">7 天</button>
+              </div>
+            </div>
+          </div>
+          <div class="trend-grid">
+            <div class="trend-chart">
+              <div class="trend-title">CPU 使用率 %</div>
+              <div class="trend-svg-wrap" id="trendCpu"></div>
+            </div>
+            <div class="trend-chart">
+              <div class="trend-title">内存使用率 %</div>
+              <div class="trend-svg-wrap" id="trendMem"></div>
+            </div>
+            <div class="trend-chart">
+              <div class="trend-title">网络速率</div>
+              <div class="trend-svg-wrap" id="trendNet"></div>
+            </div>
+          </div>
+        </div>
+        <div class="content-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>系统信息</h2>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <tbody id="sysTable"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h2>磁盘</h2>
+            </div>
+            <div class="disk-list" id="diskList"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h2>网络总量</h2>
+            </div>
+            <div class="network-chart" id="networkChart"></div>
+            <div class="net-list" id="netList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-processes" class="page">
+        <div class="toolbar">
+          <div class="segmented" id="procFilter">
+            <button class="seg active" data-kind="all">全部</button>
+            <button class="seg" data-kind="system">系统进程</button>
+            <button class="seg" data-kind="app">软件</button>
+          </div>
+          <div class="search">
+            <i data-icon="search"></i>
+            <input id="procSearch" type="search" placeholder="搜索进程名或 PID">
+          </div>
+          <button class="btn sm" id="btnProcRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+        </div>
+        <div class="panel table-panel">
+          <div class="panel-head">
+            <h2>进程列表</h2>
+            <span class="muted" id="procCount"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>PID</th>
+                  <th>类型</th>
+                  <th>用户</th>
+                  <th>CPU%</th>
+                  <th>内存</th>
+                  <th>耗电</th>
+                  <th>状态</th>
+                  <th>运行时长</th>
+                  <th>命令</th>
+                  <th class="col-actions">操作</th>
+                </tr>
+              </thead>
+              <tbody id="procBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-guard" class="page">
+        <div class="toolbar">
+          <button class="btn primary" id="btnGuardAdd"><i data-icon="plus"></i><span>添加守护</span></button>
+          <button class="btn" id="btnGuardFromRunning"><i data-icon="activity"></i><span>从运行进程添加</span></button>
+          <button class="btn sm" id="btnGuardRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+        </div>
+        <div class="panel table-panel">
+          <div class="panel-head">
+            <h2>进程守护</h2>
+            <span class="muted" id="guardCount"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>匹配规则</th>
+                  <th>状态</th>
+                  <th>PID</th>
+                  <th>守护</th>
+                  <th>重启次数</th>
+                  <th>上次重启</th>
+                  <th class="col-actions">操作</th>
+                </tr>
+              </thead>
+              <tbody id="guardBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-services" class="page">
+        <div class="toolbar">
+          <div class="search">
+            <i data-icon="search"></i>
+            <input id="serviceSearch" type="search" placeholder="搜索服务名">
+          </div>
+          <button class="btn sm" id="btnServiceRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+        </div>
+        <div class="panel table-panel">
+          <div class="panel-head">
+            <h2>systemd 服务</h2>
+            <span class="muted" id="serviceCount"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>单元</th>
+                  <th>描述</th>
+                  <th>活动状态</th>
+                  <th>子状态</th>
+                  <th>开机启动</th>
+                  <th class="col-actions">操作</th>
+                </tr>
+              </thead>
+              <tbody id="serviceBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-files" class="page">
+        <div class="toolbar">
+          <div class="pathbar">
+            <button class="btn sm" id="btnFileUp" title="上级目录"><i data-icon="arrow-up"></i></button>
+            <input id="pathInput" type="text" spellcheck="false" value="/">
+            <button class="btn sm" id="btnFileGo"><i data-icon="corner-down-left"></i><span>打开</span></button>
+          </div>
+          <span class="muted trash-note">删除会先移入回收站目录</span>
+          <button class="btn sm" id="btnFileUpload"><i data-icon="upload"></i><span>上传</span></button>
+          <input type="file" id="fileUploadInput" multiple hidden>
+          <button class="btn sm" id="btnFileMkdir"><i data-icon="folder-plus"></i><span>新建目录</span></button>
+          <button class="btn sm" id="btnFileUrl"><i data-icon="download"></i><span>在线下载</span></button>
+          <button class="btn sm" id="btnFileArchive"><i data-icon="archive"></i><span>压缩</span></button>
+          <button class="btn sm" id="btnFileExtract"><i data-icon="unarchive"></i><span>解压</span></button>
+        </div>
+        <div class="panel table-panel">
+          <div class="panel-head">
+            <h2 id="filePathTitle">/</h2>
+            <span class="muted" id="fileCount"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>类型</th>
+                  <th>大小</th>
+                  <th>权限</th>
+                  <th>属主</th>
+                  <th>修改时间</th>
+                  <th class="col-actions">操作</th>
+                </tr>
+              </thead>
+              <tbody id="fileBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-toolbox" class="page">
+        <div class="toolbar toolbox-tabs">
+          <button class="toolbox-tab active" data-toolbox-tab="system">系统信息</button>
+          <button class="toolbox-tab" data-toolbox-tab="dns">DNS</button>
+          <button class="toolbox-tab" data-toolbox-tab="hosts">Hosts</button>
+          <button class="toolbox-tab" data-toolbox-tab="cron">计划任务</button>
+          <button class="toolbox-tab" data-toolbox-tab="ssh">SSH日志</button>
+          <button class="toolbox-tab" data-toolbox-tab="container">容器</button>
+          <button class="toolbox-tab" data-toolbox-tab="analytics">网站统计</button>
+          <button class="toolbox-tab" data-toolbox-tab="tamper">防篡改</button>
+          <button class="toolbox-tab" data-toolbox-tab="backup">备份</button>
+          <button class="toolbox-tab" data-toolbox-tab="logs">日志</button>
+          <button class="toolbox-tab" data-toolbox-tab="audit">审计</button>
+          <button class="toolbox-tab" data-toolbox-tab="sshmgr">SSH 管理</button>
+          <button class="toolbox-tab" data-toolbox-tab="clean">清理</button>
+          <button class="toolbox-tab" data-toolbox-tab="clamav">病毒扫描</button>
+          <button class="toolbox-tab" data-toolbox-tab="disk">磁盘</button>
+          <button class="toolbox-tab" data-toolbox-tab="alerts">告警</button>
+        </div>
+
+        <div class="toolbox-pane active" data-tab="system">
+          <div class="toolbar">
+            <button class="btn sm" id="btnToolboxRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h2>系统信息</h2>
+            </div>
+            <div class="toolbox-body">
+              <div class="toolbox-rows" id="sysInfoRows"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="dns">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>DNS</h2>
+            </div>
+            <div class="toolbox-body">
+              <div class="toolbox-rows" id="dnsRows"></div>
+              <div class="resolve-box">
+                <input id="dnsDomain" type="text" placeholder="example.com" spellcheck="false">
+                <button class="btn sm" id="btnDnsResolve"><i data-icon="search"></i><span>解析</span></button>
+              </div>
+              <pre class="toolbox-pre" id="dnsResult">等待解析</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="hosts">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Hosts</h2>
+            </div>
+            <div class="toolbox-body">
+              <pre class="toolbox-pre hosts-pre" id="hostsContent"></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="cron">
+          <div class="toolbar">
+            <button class="btn primary" id="btnCronJobAdd"><i data-icon="plus"></i><span>新建任务</span></button>
+            <button class="btn sm" id="btnCronJobRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+          </div>
+          <div class="panel table-panel">
+            <div class="panel-head">
+              <h2>计划任务</h2>
+              <span class="muted" id="cronJobCount"></span>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>任务名</th>
+                    <th>类型</th>
+                    <th>执行周期</th>
+                    <th>上次执行</th>
+                    <th>状态</th>
+                    <th class="col-actions">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="cronJobBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel table-panel" style="margin-top:14px">
+            <div class="panel-head">
+              <h2>原生 crontab</h2>
+              <div class="toolbar">
+                <button class="btn sm" id="btnCronAdd"><i data-icon="plus"></i><span>添加行</span></button>
+                <button class="btn sm" id="btnCronRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>内容</th>
+                    <th>状态</th>
+                    <th class="col-actions">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="cronBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="ssh">
+          <div class="toolbar">
+            <div class="segmented" id="sshFilter">
+              <button class="seg active" data-kind="all">全部</button>
+              <button class="seg" data-kind="success">登录成功</button>
+              <button class="seg" data-kind="failed">登录失败</button>
+            </div>
+            <select id="sshLines" class="select sm">
+              <option value="100">100 条</option>
+              <option value="200" selected>200 条</option>
+              <option value="500">500 条</option>
+            </select>
+            <button class="btn sm" id="btnSshRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+          </div>
+          <div class="panel table-panel">
+            <div class="panel-head">
+              <h2>SSH 登录日志</h2>
+              <span class="muted" id="sshCount"></span>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>时间</th>
+                    <th>事件</th>
+                    <th>用户</th>
+                    <th>IP</th>
+                    <th>详情</th>
+                  </tr>
+                </thead>
+                <tbody id="sshBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="container">
+          <div class="toolbar">
+            <button class="btn sm" id="btnContainerRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+            <button class="btn sm" id="btnContainerCreate"><i data-icon="plus"></i><span>新建容器</span></button>
+            <button class="btn sm" id="btnContainerPull"><i data-icon="download"></i><span>拉取镜像</span></button>
+            <button class="btn sm" id="btnContainerCompose"><i data-icon="boxes"></i><span>新建 Compose</span></button>
+          </div>
+          <div id="dockerError"></div>
+          <div class="toolbar analytics-nav">
+            <div class="segmented" id="containerNav">
+              <button class="seg active" data-view="containers">容器</button>
+              <button class="seg" data-view="images">镜像</button>
+              <button class="seg" data-view="networks">网络</button>
+              <button class="seg" data-view="volumes">卷</button>
+              <button class="seg" data-view="compose">Compose</button>
+              <button class="seg" data-view="stats">资源</button>
+            </div>
+          </div>
+          <div id="containerView"></div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="analytics">
+          <div class="toolbar">
+            <div class="pathbar analytics-path">
+              <input id="analyticsPath" type="text" spellcheck="false" placeholder="/var/log/nginx/access.log">
+              <input id="analyticsPorts" class="port-input" type="text" spellcheck="false" placeholder="端口：6000,6001">
+              <button class="btn sm" id="btnAnalyticsSavePath"><i data-icon="save"></i><span>保存</span></button>
+            </div>
+            <button class="btn sm" id="btnAnalyticsRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+          </div>
+          <div class="metric-grid analytics-metrics" id="analyticsMetrics"></div>
+          <div class="toolbar analytics-nav">
+            <div class="segmented" id="analyticsNav">
+              <button class="seg active" data-view="realtime">实时监控</button>
+              <button class="seg" data-view="trend">访客趋势</button>
+              <button class="seg" data-view="sources">访客来源</button>
+              <button class="seg" data-view="stats">访问统计</button>
+              <button class="seg" data-view="requests">请求日志</button>
+              <button class="seg" data-view="ports">端口监控</button>
+            </div>
+          </div>
+          <div id="analyticsView"></div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="tamper">
+          <div class="toolbar">
+            <div class="pathbar analytics-path">
+              <input id="tamperPath" type="text" spellcheck="false" placeholder="/var/www">
+              <button class="btn sm" id="btnTamperSavePath"><i data-icon="save"></i><span>保存</span></button>
+            </div>
+            <button class="btn sm" id="btnTamperInit"><i data-icon="shield"></i><span>初始化基线</span></button>
+            <button class="btn sm" id="btnTamperScan"><i data-icon="activity"></i><span>立即扫描</span></button>
+            <button class="btn sm" id="btnTamperRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+          </div>
+          <div class="metric-grid analytics-metrics" id="tamperMetrics"></div>
+          <div class="toolbar analytics-nav">
+            <div class="segmented" id="tamperNav">
+              <button class="seg active" data-view="anomalies">异常文件</button>
+              <button class="seg" data-view="permissions">权限风险</button>
+              <button class="seg" data-view="events">审计日志</button>
+            </div>
+          </div>
+          <div id="tamperView"></div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="backup">
+          <div class="toolbar">
+            <button class="btn sm primary" id="btnBackupCreate"><i data-icon="plus"></i><span>新建备份</span></button>
+            <button class="btn sm" id="btnBackupRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+            <span class="muted">备份目录 ~/.panel-backups</span>
+          </div>
+          <div class="panel table-panel">
+            <div class="panel-head">
+              <h2>备份列表</h2>
+              <span class="muted" id="backupCount"></span>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>文件</th>
+                    <th>大小</th>
+                    <th>时间</th>
+                    <th class="col-actions">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="backupBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel table-panel" style="margin-top:14px">
+            <div class="panel-head">
+              <h2>云端备份（WebDAV）</h2>
+              <div class="cloud-toolbar">
+                <span class="cloud-state" id="cloudState">未配置</span>
+                <button class="btn sm" id="btnWebdavConfig"><i data-icon="save"></i><span>云存储设置</span></button>
+                <button class="btn sm" id="btnWebdavTest"><i data-icon="activity"></i><span>测试连接</span></button>
+                <button class="btn sm" id="btnWebdavRefresh"><i data-icon="refresh"></i><span>刷新云端列表</span></button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>文件</th>
+                    <th>大小</th>
+                    <th>时间</th>
+                    <th class="col-actions">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="cloudBody"><tr><td colspan="4" class="muted">未配置云存储</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="logs">
+          <div class="toolbar">
+            <div class="search">
+              <i data-icon="search"></i>
+              <input id="logSearch" type="search" placeholder="过滤日志内容">
+            </div>
+            <select id="logLines" class="select">
+              <option value="100">100 行</option>
+              <option value="200" selected>200 行</option>
+              <option value="500">500 行</option>
+              <option value="1000">1000 行</option>
+            </select>
+            <button class="btn sm" id="btnLogRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+          </div>
+          <div class="panel log-panel">
+            <div class="panel-head">
+              <h2>系统日志</h2>
+              <span class="muted" id="logSource"></span>
+            </div>
+            <pre class="log-output" id="logOutput">加载中...</pre>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="audit">
+          <div class="toolbar">
+            <button class="btn sm" id="btnAuditRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+            <button class="btn sm danger" id="btnAuditClear"><i data-icon="trash"></i><span>清空</span></button>
+            <select id="auditLines" class="select">
+              <option value="100">100 条</option>
+              <option value="200" selected>200 条</option>
+              <option value="500">500 条</option>
+              <option value="1000">1000 条</option>
+            </select>
+            <span class="muted">记录目录 ~/.panel-audit/operations.log</span>
+          </div>
+          <div class="panel table-panel">
+            <div class="panel-head">
+              <h2>面板操作审计</h2>
+              <span class="muted" id="auditCount"></span>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>时间</th>
+                    <th>来源 IP</th>
+                    <th>操作</th>
+                    <th>详情</th>
+                    <th>结果</th>
+                    <th>耗时</th>
+                  </tr>
+                </thead>
+                <tbody id="auditBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="sshmgr">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>SSH 管理</h2>
+              <button class="btn sm" id="btnSshRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+            </div>
+            <div class="toolbox-body">
+              <div class="settings-grid">
+                <div class="setting-item">
+                  <label class="form-label">SSH 端口</label>
+                  <input id="sshPort" class="modal-input" type="number" placeholder="22">
+                </div>
+                <div class="setting-item">
+                  <label class="form-label">允许 root 登录</label>
+                  <select id="sshRoot" class="modal-input">
+                    <option value="yes">允许</option>
+                    <option value="prohibit-password">仅密钥</option>
+                    <option value="no">禁止</option>
+                  </select>
+                </div>
+                <div class="setting-item">
+                  <label class="form-label">密码登录</label>
+                  <select id="sshPass" class="modal-input">
+                    <option value="yes">允许</option>
+                    <option value="no">禁止（仅密钥）</option>
+                  </select>
+                </div>
+              </div>
+              <p class="muted" style="font-size:12px">保存前会执行 sshd -t 校验，配置有误不会生效，避免把自己锁在外面。</p>
+              <div class="modal-actions" style="justify-content:flex-start">
+                <button class="btn primary" id="btnSshSave"><i data-icon="save"></i><span>保存并重启 SSH</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="clean">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>缓存清理</h2>
+              <div class="toolbar">
+                <span class="muted" id="cleanTotal"></span>
+                <button class="btn sm" id="btnCleanRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+                <button class="btn primary sm" id="btnCleanRun"><i data-icon="trash"></i><span>清理选中项</span></button>
+              </div>
+            </div>
+            <div class="toolbox-body">
+              <div id="cleanList"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="clamav">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>病毒扫描（ClamAV）</h2>
+              <div class="toolbar">
+                <span class="badge" id="clamavBadge">检测中</span>
+                <button class="btn sm" id="btnClamavInstall" style="display:none"><i data-icon="download"></i><span>安装 ClamAV</span></button>
+                <button class="btn sm" id="btnClamavRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+              </div>
+            </div>
+            <div class="toolbox-body">
+              <div class="settings-grid">
+                <div class="setting-item">
+                  <label class="form-label">扫描路径</label>
+                  <input id="clamavPath" class="modal-input" value="/" spellcheck="false">
+                </div>
+              </div>
+              <p class="muted" style="font-size:12px">扫描前会自动更新病毒库（freshclam），全盘扫描可能耗时较长，在后台执行。</p>
+              <div class="modal-actions" style="justify-content:flex-start">
+                <button class="btn primary" id="btnClamavScan"><i data-icon="shield"></i><span>开始扫描</span></button>
+              </div>
+              <div id="clamavResult" style="margin-top:14px"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="disk">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>磁盘管理</h2>
+              <button class="btn sm" id="btnDiskRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+            </div>
+            <div class="toolbox-body">
+              <h3 style="margin:0 0 8px;font-size:14px">块设备</h3>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>设备</th>
+                      <th>大小</th>
+                      <th>类型</th>
+                      <th>文件系统</th>
+                      <th>挂载点</th>
+                      <th>型号</th>
+                    </tr>
+                  </thead>
+                  <tbody id="diskBlockBody"></tbody>
+                </table>
+              </div>
+              <h3 style="margin:16px 0 8px;font-size:14px">空间使用</h3>
+              <div class="disk-list" id="diskUsageList"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbox-pane" data-tab="alerts">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>监控告警</h2>
+              <button class="btn sm" id="btnAlertsRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+            </div>
+            <div class="toolbox-body">
+              <label class="check-row" style="margin-bottom:12px">
+                <input type="checkbox" id="alertEnabled"> 启用阈值告警（CPU/内存/磁盘超限时推送 Webhook）
+              </label>
+              <div class="settings-grid">
+                <div class="setting-item">
+                  <label class="form-label">Webhook 地址</label>
+                  <input id="alertWebhook" class="modal-input" spellcheck="false" placeholder="https://oapi.dingtalk.com/robot/send?access_token=...">
+                  <span class="muted" style="font-size:11px">支持钉钉 / 飞书 / 企业微信机器人</span>
+                </div>
+                <div class="setting-item">
+                  <label class="form-label">CPU 阈值 (%)</label>
+                  <input id="alertCpu" class="modal-input" type="number" min="1" max="100" value="90">
+                </div>
+                <div class="setting-item">
+                  <label class="form-label">内存阈值 (%)</label>
+                  <input id="alertMem" class="modal-input" type="number" min="1" max="100" value="90">
+                </div>
+                <div class="setting-item">
+                  <label class="form-label">磁盘阈值 (%)</label>
+                  <input id="alertDisk" class="modal-input" type="number" min="1" max="100" value="90">
+                </div>
+                <div class="setting-item">
+                  <label class="form-label">告警冷却（分钟）</label>
+                  <input id="alertCooldown" class="modal-input" type="number" min="1" value="30">
+                </div>
+              </div>
+              <div class="modal-actions" style="justify-content:flex-start;margin-top:12px">
+                <button class="btn primary" id="btnAlertsSave"><i data-icon="save"></i><span>保存配置</span></button>
+                <button class="btn" id="btnAlertsTest"><i data-icon="activity"></i><span>发送测试消息</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-firewall" class="page">
+        <div class="toolbar">
+          <div class="segmented" id="firewallNav">
+            <button class="seg active" data-view="ufw">UFW</button>
+            <button class="seg" data-view="fail2ban">Fail2ban</button>
+          </div>
+        </div>
+        <div id="firewallUfwView">
+          <div class="toolbar">
+            <button class="btn sm" id="btnFirewallRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+            <button class="btn sm" id="btnFirewallToggle"><i data-icon="power"></i><span id="firewallToggleText">切换状态</span></button>
+            <button class="btn primary sm" id="btnFirewallAdd"><i data-icon="plus"></i><span>添加规则</span></button>
+          </div>
+          <div id="firewallError"></div>
+          <div class="metric-grid" id="firewallMetrics"></div>
+          <div class="content-grid">
+            <div class="panel table-panel">
+              <div class="panel-head">
+                <h2>防火墙规则</h2>
+                <span class="muted" id="firewallRuleCount"></span>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>规则</th>
+                      <th>动作</th>
+                      <th>方向</th>
+                      <th>来源</th>
+                      <th class="col-actions">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="firewallBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <h2>UFW 应用配置</h2>
+                <span class="muted" id="firewallAppCount"></span>
+              </div>
+              <div class="toolbox-body">
+                <div class="chip-list" id="firewallApps"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="firewallFail2banView" class="hidden-view">
+          <div class="toolbar">
+            <button class="btn sm" id="btnF2bRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+            <button class="btn sm primary" id="btnF2bInstall"><i data-icon="download"></i><span>一键安装</span></button>
+            <button class="btn sm" id="btnF2bStart"><i data-icon="play"></i><span>启动</span></button>
+            <button class="btn sm" id="btnF2bRestart"><i data-icon="rotate-cw"></i><span>重启</span></button>
+            <button class="btn sm" id="btnF2bReload"><i data-icon="refresh"></i><span>重载规则</span></button>
+            <button class="btn sm" id="btnF2bStop"><i data-icon="square"></i><span>停止</span></button>
+          </div>
+          <div id="f2bError"></div>
+          <div class="metric-grid" id="f2bMetrics"></div>
+          <div class="panel table-panel">
+            <div class="panel-head">
+              <h2>Fail2ban 规则</h2>
+              <span class="muted" id="f2bJailCount"></span>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>规则</th>
+                    <th>当前失败</th>
+                    <th>累计失败</th>
+                    <th>当前封禁</th>
+                    <th>累计封禁</th>
+                    <th>封禁 IP</th>
+                  </tr>
+                </thead>
+                <tbody id="f2bBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-models" class="page">
+        <div class="toolbar">
+          <button class="btn sm" id="btnModelsRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+          <button class="btn sm" id="btnModelsInstall"><i data-icon="download"></i><span>安装 Ollama</span></button>
+          <button class="btn sm" id="btnModelsPull"><i data-icon="plus"></i><span>拉取模型</span></button>
+          <button class="btn sm" id="btnModelsTest"><i data-icon="terminal"></i><span>对话测试</span></button>
+        </div>
+        <div id="modelsError"></div>
+        <div id="modelJobs"></div>
+        <div class="metric-grid" id="modelsMetrics"></div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>GPU 监控</h2>
+            <span class="muted" id="gpuSummary"></span>
+          </div>
+          <div class="network-chart" id="gpuChart"></div>
+          <div class="toolbox-body" id="gpuInfo"></div>
+        </div>
+        <div class="toolbar analytics-nav">
+          <div class="segmented" id="modelsNav">
+            <button class="seg active" data-view="local">本地模型</button>
+            <button class="seg" data-view="running">运行中</button>
+            <button class="seg" data-view="catalog">模型库</button>
+          </div>
+        </div>
+        <div id="modelsView"></div>
+      </section>
+
+      <section id="page-apps" class="page">
+        <div class="category-index" id="appsCategories"></div>
+        <div class="toolbar">
+          <div class="search">
+            <i data-icon="search"></i>
+            <input id="appsSearch" type="search" placeholder="搜索应用名/类别/说明/指令">
+          </div>
+          <button class="btn sm" id="btnAppsCheckUpdate"><i data-icon="rotate-cw"></i><span>检查更新</span></button>
+          <button class="btn sm" id="btnAppsRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+        </div>
+        <div class="panel table-panel" style="margin-bottom:16px">
+          <div class="panel-head">
+            <h2>Docker 应用</h2>
+            <span class="muted">容器化安装 · 一键启停/日志/卸载</span>
+          </div>
+          <div class="docker-apps-grid" id="dockerAppsGrid"></div>
+        </div>
+        <div class="panel table-panel">
+          <div class="panel-head">
+            <h2>应用商店</h2>
+            <span class="muted" id="appsCount"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>应用</th>
+                  <th>分类</th>
+                  <th>说明</th>
+                  <th>安装指令</th>
+                  <th>状态</th>
+                  <th class="col-actions">操作</th>
+                </tr>
+              </thead>
+              <tbody id="appsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-database" class="page">
+        <div class="toolbar">
+          <button class="btn sm" id="btnDbRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+          <button class="btn sm primary" id="btnDbCreate"><i data-icon="plus"></i><span>新建数据库</span></button>
+          <button class="btn sm" id="btnDbConnect"><i data-icon="key"></i><span>连接设置</span></button>
+        </div>
+        <div id="dbEngines" class="db-engine-grid"></div>
+        <div id="dbDetail"></div>
+      </section>
+
+      <section id="page-sites" class="page">
+        <div class="toolbar">
+          <button class="btn sm primary" id="btnSiteCreate"><i data-icon="plus"></i><span>新建站点</span></button>
+          <button class="btn sm" id="btnSiteRefresh"><i data-icon="refresh"></i><span>刷新</span></button>
+          <span class="badge" id="nginxBadge">Nginx 状态未知</span>
+          <button class="btn sm" id="btnNginxInstall" style="display:none"><i data-icon="download"></i><span>安装 Nginx</span></button>
+        </div>
+        <div class="panel table-panel">
+          <div class="panel-head">
+            <h2>站点列表</h2>
+            <span class="muted" id="siteCount"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>站点名</th>
+                  <th>类型</th>
+                  <th>域名</th>
+                  <th>端口</th>
+                  <th>目录/代理目标</th>
+                  <th>状态</th>
+                  <th class="col-actions">操作</th>
+                </tr>
+              </thead>
+              <tbody id="siteBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-terminal" class="page">
+        <div class="toolbar">
+          <button class="btn sm primary" id="btnTermOpen"><i data-icon="terminal"></i><span>新建会话</span></button>
+          <button class="btn sm" id="btnTermClose"><i data-icon="x"></i><span>断开</span></button>
+          <button class="btn sm" id="btnTermFullscreen"><i data-icon="maximize"></i><span>全屏</span></button>
+          <span class="badge" id="termBadge">未连接</span>
+        </div>
+        <div class="terminal-panel" id="terminalPanel">
+          <div class="terminal-host" id="terminalHost"></div>
+        </div>
+      </section>
+
+      <section id="page-command" class="page">
+        <div class="panel command-panel">
+          <div class="panel-head">
+            <h2>命令执行</h2>
+            <span class="badge" id="commandBadge">未开启</span>
+          </div>
+          <p class="command-hint">以当前用户身份执行命令，每次执行需本机密码验证，超时 30 秒。</p>
+          <div class="quick-commands">
+            <span class="quick-label">快捷命令</span>
+            <div class="quick-list" id="quickCommands"></div>
+          </div>
+          <textarea id="commandInput" rows="4" spellcheck="false" placeholder="例如：uptime; df -h" disabled></textarea>
+          <div class="command-actions">
+            <button class="btn primary" id="btnCommandRun" disabled><i data-icon="play"></i><span>执行</span></button>
+            <button class="btn ghost sm" id="btnCommandClear"><i data-icon="x"></i><span>清空</span></button>
+          </div>
+          <pre class="command-output" id="commandOutput">等待执行...</pre>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toastWrap"></div>
+  <div id="modalRoot"></div>
+  <script src="/vendor/xterm/xterm.js"></script>
+  <script src="/vendor/xterm/xterm-addon-fit.js"></script>
+  <script src="/app.js?v=12"></script>
+</body>
+</html>

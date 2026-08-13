@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+panel.token
+panel.log
+panel-local.log
+panel-local.err
+node_modules/
+.reasonix/
