@@ -96,3 +96,7 @@ python deploy.py --host 192.168.3.251 --user lty --allow-command
 - 危险操作均有二次确认
 - 文件删除是移动到 `~/.panel-trash`，不是直接删除
 - 命令执行默认关闭，仅在测试环境按需开启
+
+## 免责声明
+
+本项目按"现状"提供，使用风险自负。多语言（中/英/日/法/俄）免责声明见 [DISCLAIMER.md](DISCLAIMER.md)。
